@@ -1,0 +1,86 @@
+Introduction
+This guide focuses on deploying WordPress, a widely-used content management system, with a backend database powered by Amazon RDS for MySQL. The use of Amazon RDS simplifies database administration tasks, such as backups, patching, and scaling.
+
+What You Will Accomplish
+Set up a WordPress site with a separate database instance using Amazon RDS for MySQL.
+Create AWS resources: An EC2 instance for the WordPress application and an RDS instance for MySQL database storage.
+Why This Matters
+Utilizing Amazon RDS for MySQL offers automated backup, recovery, updates, and patches, ensuring your database is secure and performant without requiring extensive database management knowledge.
+
+Prerequisites
+A personal AWS account with administrator-level access.
+The latest version of Chrome or Firefox recommended.
+Services Used
+Amazon EC2
+Amazon RDS for MySQL
+
+Step 1: Sign Up for AWS
+Create an AWS Account: Visit the AWS homepage and sign up. You'll need an email address and a credit card, but don't worry, we'll use services that fall within the AWS Free Tier.
+
+Step 2: Create an Amazon RDS MySQL Database
+Open RDS Dashboard: In the AWS Management Console, find and click on "RDS" under "Database".
+Launch Database: Click "Create database", choose "Standard Create", and select "MySQL".
+Database Settings:
+DB instance identifier: Enter a name for your database, like wordpressdb.
+Master username: Enter a username.
+Master password: Choose a password and remember it.
+DB Instance Size: Choose the Free Tier option.
+Connectivity:
+Public access: Choose "Yes".
+Note the VPC Security Group, you'll adjust it later.
+Database Options: Enter wordpress as the Initial database name. Leave other options as default.
+Create Database: Click "Create database". It might take a few minutes.
+
+Step 3: Launch an EC2 Instance for WordPress
+Navigate to EC2 Dashboard: In the AWS Console, click on "Services", then "EC2".
+Launch Instance: Click "Launch Instances".
+Select Amazon Machine Image (AMI): Choose an Amazon Linux 2 AMI (Free Tier eligible).
+Choose Instance Type: Select t2.micro (Free Tier eligible) and click "Next: Configure Instance Details".
+Configure Details: Leave defaults, but make sure "Auto-assign Public IP" is enabled. Click "Next" until you reach "Configure Security Group".
+Configure Security Group: Create a new security group. Add rules to allow HTTP (Port 80) and SSH (Port 22) from anywhere. Name it wordpress-security.
+Launch: Click "Review and Launch", then "Launch". When prompted, create a new key pair, download it, and keep it safe. Click "Launch Instances".
+
+Step 4: Adjust RDS Security Group for EC2 Access
+Open VPC Dashboard: From the Services menu, go to "VPC".
+Security Groups: Find the RDS security group you noted earlier.
+Edit Inbound Rules: Add a new rule to allow MySQL/Aurora (Port 3306) access from the EC2 instance's security group.
+
+Step 5: Connect to Your EC2 Instance
+Find Your EC2 Public IP: On the EC2 dashboard, look for your instance and note its public IP.
+SSH into Your Instance: Use a terminal (Linux/Mac) or PuTTY (Windows) with the command:
+css
+Copy code
+ssh -i /path/to/your-key.pem ec2-user@your-instance-public-ip
+Replace /path/to/your-key.pem with the path to your downloaded key and your-instance-public-ip with your EC2's public IP.
+
+Step 6: Install WordPress on EC2
+Update Your Instance: Run sudo yum update -y.
+Install Apache, PHP, and Other Necessary Packages:
+Copy code
+sudo yum install -y httpd php php-mysqlnd
+Start Apache: sudo systemctl start httpd and sudo systemctl enable httpd.
+Download WordPress:
+arduino
+Copy code
+wget https://wordpress.org/latest.tar.gz
+tar -xzf latest.tar.gz
+Move WordPress:
+bash
+Copy code
+sudo cp -r wordpress/* /var/www/html/
+Set Permissions:
+bash
+Copy code
+sudo chown -R apache:apache /var/www/html
+sudo chmod -R 755 /var/www/html
+Configure wp-config.php: Navigate to /var/www/html, rename wp-config-sample.php to wp-config.php, and edit it to include your RDS database name, username, and password.
+
+Step 7: Finish WordPress Setup
+Open Your Site: In a web browser, go to your EC2 instance's public IP address.
+Install WordPress: Follow the on-screen instructions to complete the WordPress installation.
+
+Congratulations! You've successfully deployed a WordPress site on an EC2 instance, using Amazon RDS for the MySQL database. Remember to clean up your AWS resources when you're done to avoid unnecessary charges.
+
+
+
+
